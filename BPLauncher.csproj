@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>Assets/img/iconMedium.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ApplicationDefinition Include="XAMLs\App.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </ApplicationDefinition>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Page Update="XAMLs\MainWindow.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Assets\fonts\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Assets\img\BP_logo.png"/>
+        <Resource Include="Assets\img\BP_logo.png"/>
+        <None Remove="Assets\img\favicon.ico"/>
+        <None Remove="Assets\img\iconMedium.ico"/>
+        <None Remove="Assets\img\iconBig.ico"/>
+        <None Remove="Assets\img\iconSmall.ico"/>
+        <Resource Include="Assets\img\iconsmall.ico">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Resource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Resource Include="Assets\img\iconmedium.ico">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Resource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.5.0"/>
+    </ItemGroup>
+
+</Project>
