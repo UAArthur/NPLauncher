@@ -36,7 +36,6 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- Ensure everything is wrapped in a rounded Border -->
     <Border Background="{StaticResource SemiTransparentBackground}" CornerRadius="10" Padding="10">
         <Grid>
             <ListBox Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Stretch">
