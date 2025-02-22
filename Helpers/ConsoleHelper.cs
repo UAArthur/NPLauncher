@@ -15,21 +15,17 @@ public static class ConsoleHelper
 
     public static void ShowConsole()
     {
-        if (!_consoleAllocated)
-        {
-            AllocConsole();
-            _consoleAllocated = true;
-            RedirectOutput();
-        }
+        if (_consoleAllocated) return;
+        AllocConsole();
+        _consoleAllocated = true;
+        RedirectOutput();
     }
 
     public static void HideConsole()
     {
-        if (_consoleAllocated)
-        {
-            FreeConsole();
-            _consoleAllocated = false;
-        }
+        if (!_consoleAllocated) return;
+        FreeConsole();
+        _consoleAllocated = false;
     }
 
     private static void RedirectOutput()
