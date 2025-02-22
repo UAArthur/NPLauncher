@@ -120,17 +120,11 @@ public partial class MainWindow : Window
         if (SettingsMenuContainer.Visibility == Visibility.Visible)
         {
             Logger.Info("Clicked outside of SettingsMenu. Closing.");
-
-            if (!SettingsMenuContainer.IsAncestorOf((DependencyObject)e.OriginalSource))
-            {
-                Logger.Info("Clicked outside of SettingsMenu. Closing.");
-                SettingsMenuContainer.Visibility = Visibility.Collapsed;
-                SettingsMenuContainer.IsHitTestVisible = false;
-            }
+            SettingsMenuContainer.Visibility = Visibility.Collapsed;
+            SettingsMenuContainer.IsHitTestVisible = false;
         }
     }
-
-
+    
     protected override void OnClosing(CancelEventArgs e)
     {
         e.Cancel = true;
