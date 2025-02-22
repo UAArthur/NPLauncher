@@ -49,6 +49,8 @@
         <Resource Include="Assets\lang\en_US\blast_translation_mod_1_P.sig" />
         <None Remove="Assets\lang\en_US\en_US.json" />
         <Resource Include="Assets\lang\en_US\en_US.json" />
+        <None Remove="Assets\lang\ja_JP\ja_JP.json" />
+        <Resource Include="Assets\lang\ja_JP\ja_JP.json" />
     </ItemGroup>
 
     <ItemGroup>

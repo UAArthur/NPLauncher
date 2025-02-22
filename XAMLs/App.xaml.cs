@@ -24,9 +24,10 @@ public partial class App : Application
             Current.Shutdown();
             return;
         }
-
+       
         // Init AppSettings
         var appSettings = new AppSettings();
+        await LanguageHandler.LoadLanguagesAsync();
 
         // Initialize Logger and Console
         ConsoleHelper.ShowConsole();
