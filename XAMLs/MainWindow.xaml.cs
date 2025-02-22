@@ -34,7 +34,7 @@ public partial class MainWindow : Window
 
     private void GameStatusTimer_Tick(object? sender, EventArgs? e)
     {
-        if (_gameService.IsGameRunning())
+        if (GameService.IsGameRunning())
         {
             StartButton.IsEnabled = false;
             StartButton.Content = "Game Running";
@@ -63,28 +63,24 @@ public partial class MainWindow : Window
 
     private async void BtnStart_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button)
-        {
-            Logger.Info("Trying to start the game...");
-            WindowState = WindowState.Minimized;
+        if (sender is not Button button) return;
+        Logger.Info("Trying to start the game...");
+        WindowState = WindowState.Minimized;
 
-            // Start the game
-            var gameProcess = await Task.Run(() => _gameService.StartGame());
-            if (gameProcess != null)
+        // Start the game
+        var gameProcess = await Task.Run(() => GameService.StartGame());
+        if (gameProcess == null) return;
+        gameProcess.EnableRaisingEvents = true;
+        gameProcess.Exited += (s, args) =>
+        {
+            Dispatcher.Invoke(() =>
             {
-                gameProcess.EnableRaisingEvents = true;
-                gameProcess.Exited += (s, args) =>
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        Logger.Info(
-                            "========================================== Game Exited ===============================================");
-                        WindowState = WindowState.Normal;
-                        Show();
-                    });
-                };
-            }
-        }
+                Logger.Info(
+                    "========================================== Game Exited ===============================================");
+                WindowState = WindowState.Normal;
+                Show();
+            });
+        };
     }
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
@@ -109,16 +105,14 @@ public partial class MainWindow : Window
         var menuHeight = settingsMenu.ActualHeight > 0 ? settingsMenu.ActualHeight : 250;
         var menuWidth = settingsMenu.ActualWidth > 0 ? settingsMenu.ActualWidth : 250;
 
-        double offsetX = 30;
+        const double offsetX = 30;
         var centeredX = buttonPosition.X + SettingsButton.ActualWidth / 2 - menuWidth / 2 - offsetX;
 
         settingsMenu.Margin = new Thickness(centeredX, buttonPosition.Y - menuHeight - 100, 0, 0);
 
         SettingsMenuContainer.Visibility = Visibility.Visible;
-        settingsMenu.IsHitTestVisible = true;
-        SettingsMenuContainer.IsHitTestVisible = false;
+        SettingsMenuContainer.IsHitTestVisible = true;
     }
-
 
     /////////////////// Event Handlers ///////////////////
     private void MainGrid_MouseDown(object sender, MouseButtonEventArgs e)

@@ -20,7 +20,7 @@ public class UriHandlers
             Logger.Debug($"Launching 'Blue Protocol' with arguments: {gameArgsString}");
 
             var gameService = new GameService();
-            var gameProcess = gameService.StartGame(gameArgsString);
+            var gameProcess = GameService.StartGame(gameArgsString);
         }
     }
 }

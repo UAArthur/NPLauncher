@@ -2,6 +2,7 @@
 using System.IO;
 using BPLauncher.Config;
 using BPLauncher.utils;
+using static System.Diagnostics.Process;
 
 namespace BPLauncher.services;
 
@@ -17,7 +18,7 @@ public class GameService
         }
     }
 
-    public Process? StartGame(string? args = null)
+    public static Process? StartGame(string? args = null)
     {
         Logger.Info(
             "========================================== Start Game ===============================================");
@@ -49,36 +50,33 @@ public class GameService
             Logger.Debug("Starting Game with arguments: " + args);
         }
 
-        var gameProcess = Process.Start(startInfo);
+        var gameProcess = Start(startInfo);
 
-        if (gameProcess != null)
-        {
-            Logger.Debug("Game started.");
-            gameProcess.EnableRaisingEvents = true;
-        }
+        if (gameProcess == null) return gameProcess;
+        Logger.Debug("Game started.");
+        gameProcess.EnableRaisingEvents = true;
 
         return gameProcess;
     }
 
 
     //Kill Game
-    public void StopGame()
+    public static void StopGame()
     {
         //Check if the game is running
-        if (!Process.GetProcessesByName("BLUEPROTOCOL-Win64-Shipping").Any())
+        if (GetProcessesByName("BLUEPROTOCOL-Win64-Shipping").Length == 0)
         {
             Logger.Debug("Game is not running.");
             return;
         }
 
         //Stop the game
-        foreach (var process in Process.GetProcessesByName("BLUEPROTOCOL-Win64-Shipping")) process.Kill();
+        foreach (var process in GetProcessesByName("BLUEPROTOCOL-Win64-Shipping")) process.Kill();
         Logger.Debug("Game stopped.");
     }
 
-    public bool IsGameRunning()
+    public static bool IsGameRunning()
     {
-        return Process.GetProcessesByName("BLUEPROTOCOL-Win64-Shipping").Any() ||
-               Process.GetProcessesByName("BLUE PROTOCOL").Any();
+        return GetProcessesByName("BLUEPROTOCOL-Win64-Shipping").Length != 0 || Array.Empty<Process>().Length != 0;
     }
 }
