@@ -43,6 +43,12 @@
         <Resource Include="Assets\img\iconsmall.ico">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Resource>
+        <None Remove="Assets\lang\en_US\blast_translation_mod_1_P.pak" />
+        <Resource Include="Assets\lang\en_US\blast_translation_mod_1_P.pak" />
+        <None Remove="Assets\lang\en_US\blast_translation_mod_1_P.sig" />
+        <Resource Include="Assets\lang\en_US\blast_translation_mod_1_P.sig" />
+        <None Remove="Assets\lang\en_US\en_US.json" />
+        <Resource Include="Assets\lang\en_US\en_US.json" />
     </ItemGroup>
 
     <ItemGroup>
