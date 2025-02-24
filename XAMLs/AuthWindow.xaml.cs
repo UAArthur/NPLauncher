@@ -93,7 +93,7 @@ public partial class AuthWindow : Window
             Logger.Info("Login successful");
             // Save the account
             AppSettings.GetAccounts()
-                ?.AddOrUpdateAccountAsync(_authService.GetCurrentAccount() ?? throw new InvalidOperationException());
+                ?.AddOrUpdateAccountAsync(AuthService.GetCurrentAccount() ?? throw new InvalidOperationException());
             AppSettings.GetAccounts()?.SaveAsync();
 
             // Open the MainWindow

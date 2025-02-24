@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using System.Text.Json;
+using Newtonsoft.Json;
 using BPLauncher.utils;
 
 namespace BPLauncher.Config;
@@ -23,7 +23,7 @@ public class LauncherAccountStore
                 Logger.Debug("Loading accounts from file...");
                 var json = await File.ReadAllTextAsync(FilePath);
 
-                var tempData = JsonSerializer.Deserialize<LauncherAccountStoreWrapper>(json);
+                var tempData = JsonConvert.DeserializeObject<LauncherAccountStoreWrapper>(json);
 
                 if (tempData?.Accounts != null)
                 {
@@ -52,7 +52,7 @@ public class LauncherAccountStore
     {
         try
         {
-            var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonConvert.SerializeObject(this, Formatting.Indented);
             await File.WriteAllTextAsync(FilePath, json);
             Logger.Debug("Accounts saved successfully.");
         }

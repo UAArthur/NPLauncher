@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using BPLauncher.services;
 using BPLauncher.utils;
 
 namespace BPLauncher.Config;
@@ -42,6 +43,7 @@ public class AppSettings
     {
         Logger.Debug("Loading accounts asynchronously...");
         await Accounts?.LoadAsync()!;
+        AuthService.SetCurrentAccount(GetAccounts()!.Accounts.First().Value);
     }
 
     public static string GetBaseUrl()

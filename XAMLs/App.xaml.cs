@@ -2,6 +2,7 @@
 using BPLauncher.Config;
 using BPLauncher.Handlers;
 using BPLauncher.Helpers;
+using BPLauncher.services;
 using BPLauncher.utils;
 using Hardcodet.Wpf.TaskbarNotification;
 
@@ -11,6 +12,7 @@ public partial class App : Application
 {
     private TaskbarIcon? _trayIcon;
     private static Mutex? _mutex;
+    private readonly AuthService _authService = new();
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -26,7 +28,7 @@ public partial class App : Application
                 Current.Shutdown();
                 return;
             }
-       
+
             // Init AppSettings
             var appSettings = new AppSettings();
             await LanguageHandler.LoadLanguagesAsync();
@@ -58,8 +60,16 @@ public partial class App : Application
             }
             else
             {
-                Logger.Debug("Valid account found, opening MainWindow.");
-                Current.MainWindow = new MainWindow();
+                if (await _authService.CheckToken())
+                {
+                    Logger.Debug("Valid account found, opening MainWindow.");
+                    Current.MainWindow = new MainWindow();
+                }
+                else
+                {
+                    Logger.Debug("No valid account found, opening AuthWindow.");
+                    Current.MainWindow = new AuthWindow();
+                }
             }
 
             Current.MainWindow.Show();
@@ -128,7 +138,7 @@ public partial class App : Application
         activeWindow.ShowInTaskbar = true;
         activeWindow.Activate();
     }
-    
+
     protected override void OnExit(ExitEventArgs e)
     {
         Logger.Debug("Application exiting, disposing tray icon.");
@@ -137,9 +147,7 @@ public partial class App : Application
 
         GC.Collect();
         GC.WaitForPendingFinalizers();
-    
+
         base.OnExit(e);
     }
-
-
 }
