@@ -1,61 +1,72 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace BPLauncher.XAMLs.UC;
-
-public partial class SettingsMenu : UserControl
+namespace BPLauncher.XAMLs.UC
 {
-    private DispatcherTimer? _scrollTimer;
-    private double _currentOffset;
-    private double _targetOffset;
-
-    public SettingsMenu()
+    public partial class SettingsMenu : UserControl
     {
-        InitializeComponent();
-    }
+        private DispatcherTimer? _scrollTimer;
+        private double _targetOffset;
+        private const double AnimationDuration = 200.0;
+        private const double FrameRate = 120.0;
+        private const double WheelDivisor = 1.0;
+        private DateTime _startTime;
+        private double _startOffset;
 
-    public void SmoothScroll(double targetOffset)
-    {
-        if (ScrollViewerControl == null) return;
-
-        _currentOffset = ScrollViewerControl.VerticalOffset;
-        _targetOffset = targetOffset;
-
-        if (_scrollTimer != null)
+        public SettingsMenu()
         {
-            _scrollTimer.Stop();
-            _scrollTimer = null;
+            InitializeComponent();
         }
 
-        _scrollTimer = new DispatcherTimer
+        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            Interval = TimeSpan.FromMilliseconds(10)
-        };
+            if (sender is not ScrollViewer scrollViewer) return;
 
-        _scrollTimer.Tick += (s, e) =>
+            e.Handled = true;
+            var delta = e.Delta / WheelDivisor;
+            var newOffset = scrollViewer.VerticalOffset - delta;
+            _targetOffset = Math.Max(0, Math.Min(newOffset, scrollViewer.ScrollableHeight));
+            StartSmoothScroll(scrollViewer);
+        }
+
+        public void SmoothScrollTo(double targetOffset)
         {
-            _currentOffset = (_currentOffset * 0.8) + (_targetOffset * 0.2);
+            if (ScrollViewerControl == null) return;
 
-            if (Math.Abs(_currentOffset - _targetOffset) < 0.5)
+            _targetOffset = Math.Max(0, Math.Min(targetOffset, ScrollViewerControl.ScrollableHeight));
+            StartSmoothScroll(ScrollViewerControl);
+        }
+
+        private void StartSmoothScroll(ScrollViewer scrollViewer)
+        {
+            _scrollTimer?.Stop();
+            _startOffset = scrollViewer.VerticalOffset;
+            _startTime = DateTime.Now;
+            _scrollTimer = new DispatcherTimer
             {
-                _currentOffset = _targetOffset;
-                _scrollTimer.Stop();
-            }
+                Interval = TimeSpan.FromMilliseconds(1000.0 / FrameRate)
+            };
 
-            ScrollViewerControl.ScrollToVerticalOffset(_currentOffset);
-        };
+            _scrollTimer.Tick += (s, e) =>
+            {
+                var elapsed = (DateTime.Now - _startTime).TotalMilliseconds;
+                if (elapsed >= AnimationDuration)
+                {
+                    scrollViewer.ScrollToVerticalOffset(_targetOffset);
+                    _scrollTimer.Stop();
+                    return;
+                }
 
-        _scrollTimer.Start();
-    }
+                var progress = elapsed / AnimationDuration;
+                var easedProgress = Math.Sin(progress * Math.PI / 2);
+                var currentOffset = _startOffset + (_targetOffset - _startOffset) * easedProgress;
+                scrollViewer.ScrollToVerticalOffset(currentOffset);
+            };
 
-    private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-        if (sender is ScrollViewer scrollViewer)
-        {
-            double newOffset = scrollViewer.VerticalOffset - (e.Delta / 3.0);
-            SmoothScroll(newOffset);
-            e.Handled = true; 
+            _scrollTimer.Start();
         }
     }
 }
