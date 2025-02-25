@@ -23,7 +23,7 @@ namespace BPLauncher.Handlers
             public string SigFile { get; set; }
         }
 
-        private static readonly List<Language> _languages = [];
+        private static readonly List<Language> Languages = [];
         private static Language _currentLanguage;
 
         public static async Task LoadLanguagesAsync()
@@ -33,7 +33,7 @@ namespace BPLauncher.Handlers
 
         private static async Task LoadLanguages()
         {
-            _languages.Clear();
+            Languages.Clear();
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = assembly.GetName().Name + ".g.resources";
             Logger.Debug("Loading languages from embedded resources...");
@@ -50,7 +50,7 @@ namespace BPLauncher.Handlers
 
                     var langCode = resourceKey.Split('/')[2];
 
-                    if (_languages.Any(l => l.Code == langCode)) continue;
+                    if (Languages.Any(l => l.Code == langCode)) continue;
 
                     var language = new Language
                     {
@@ -64,7 +64,7 @@ namespace BPLauncher.Handlers
                             $"pack://application:,,,/{assembly.GetName().Name};component/assets/lang/{langCode}/blast_translation_mod_1_p.sig"
                     };
 
-                    _languages.Add(language);
+                    Languages.Add(language);
                     Logger.Debug($"Loaded language: {langCode}");
                 }
             }
@@ -76,7 +76,7 @@ namespace BPLauncher.Handlers
 
         public static async Task SwitchGameLanguage(string languageCode)
         {
-            Language? language = _languages.FirstOrDefault(l => l.Code == languageCode);
+            Language? language = Languages.FirstOrDefault(l => l.Code == languageCode);
             if (language == null)
             {
                 Logger.Error($"Language {languageCode} not found");
@@ -110,7 +110,7 @@ namespace BPLauncher.Handlers
         }
 
         private static async Task CopyResourceToFile(string resourcePath, string destinationPath)
-        {
+        { 
             Logger.Debug($"Copying resource {resourcePath} to {destinationPath}");
             try
             {
@@ -142,7 +142,7 @@ namespace BPLauncher.Handlers
 
         public List<Language> GetLanguages()
         {
-            return _languages;
+            return Languages;
         }
     }
 }
