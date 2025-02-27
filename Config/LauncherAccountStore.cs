@@ -13,6 +13,9 @@ public class LauncherAccountStore
     public LauncherAccountStore()
     {
         Logger.Debug("Initializing LauncherAccountStore...");
+        //create accounts file if not exists
+        if (!File.Exists(FilePath))
+            File.WriteAllText(FilePath, JsonConvert.SerializeObject(new LauncherAccountStoreWrapper()));
     }
 
     public async Task LoadAsync()
