@@ -13,7 +13,7 @@ namespace BPLauncher.XAMLs;
 public partial class MainWindow : Window
 {
     private readonly GameService _gameService;
-    private readonly DispatcherTimer _gameStatusTimer;
+    private readonly DispatcherTimer? _gameStatusTimer;
 
     public MainWindow()
     {
@@ -22,14 +22,25 @@ public partial class MainWindow : Window
         VersionLabel.Content = "Version: " + AppSettings.GetVersion();
         _gameService = new GameService();
 
-        // Initialize and start the timer
-        _gameStatusTimer = new DispatcherTimer
+        //Check Status of Game
+        //If game is running, disable the start button
+        //If game is not installed, replace the start button with an import button (To import the ZIP file)
+        if (GameService.IsGameInstalled() == false)
         {
-            Interval = TimeSpan.FromSeconds(5)
-        };
-        _gameStatusTimer.Tick += GameStatusTimer_Tick;
-        _gameStatusTimer.Start();
-        GameStatusTimer_Tick(null, null);
+            Logger.Debug("Game is not Installed.");
+            StartButton.Content = "Import Game";
+        }
+        else
+        {
+            // Initialize and start the timer
+            _gameStatusTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(5)
+            };
+            _gameStatusTimer.Tick += GameStatusTimer_Tick;
+            _gameStatusTimer.Start();
+            GameStatusTimer_Tick(null, null);
+        }
     }
 
     private void GameStatusTimer_Tick(object? sender, EventArgs? e)
@@ -63,24 +74,45 @@ public partial class MainWindow : Window
 
     private async void BtnStart_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button) return;
-        Logger.Info("Trying to start the game...");
-        WindowState = WindowState.Minimized;
-
-        // Start the game
-        var gameProcess = await Task.Run(() => GameService.StartGame());
-        if (gameProcess == null) return;
-        gameProcess.EnableRaisingEvents = true;
-        gameProcess.Exited += (s, args) =>
+        if (GameService.IsGameInstalled())
         {
-            Dispatcher.Invoke(() =>
+            if (sender is not Button button) return;
+            Logger.Info("Trying to start the game...");
+            WindowState = WindowState.Minimized;
+
+            // Start the game
+            var gameProcess = await Task.Run(() => GameService.StartGame());
+            if (gameProcess == null) return;
+            gameProcess.EnableRaisingEvents = true;
+            gameProcess.Exited += (s, args) =>
             {
-                Logger.Info(
-                    "========================================== Game Exited ===============================================");
-                WindowState = WindowState.Normal;
-                Show();
-            });
-        };
+                Dispatcher.Invoke(() =>
+                {
+                    WindowState = WindowState.Normal;
+                    Show();
+                });
+            };
+        }
+        else if (!GameService.IsGameRunning())
+        {
+            // Logger.Info("Game is not installed. Importing game...");
+            // var dialog = new Microsoft.Win32.OpenFileDialog
+            // {
+            //     DefaultExt = ".zip",
+            //     Filter = "ZIP Files (*.zip)|*.zip"
+            // };
+            //
+            // var result = dialog.ShowDialog();
+            // if (result != true) return;
+            // var gamePath = dialog.FileName;
+            // await GameService.ImportGameAsync(gamePath);
+
+            Logger.Info("Game is not installed. Downloading game...");
+            await GameService.DownloadGameFilesAsync();
+            
+            // When the game is imported, switch the button to Start Game
+            StartButton.Content = "Start Game";
+        }
     }
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
@@ -124,7 +156,7 @@ public partial class MainWindow : Window
             SettingsMenuContainer.IsHitTestVisible = false;
         }
     }
-    
+
     protected override void OnClosing(CancelEventArgs e)
     {
         e.Cancel = true;
