@@ -7,7 +7,7 @@ namespace BPLauncher.Config;
 public class AppSettings
 {
     //Default BaseUrl
-    private static string BaseUrl { get; } = "http://localhost:8081";
+    private static string BaseUrl { get; } = "http://192.168.0.180:8081";
 
     //Default Directory Appdata\Local
     private static readonly string DefaultDirectory =
@@ -18,10 +18,7 @@ public class AppSettings
 
     //Executable Path (Default: AppData\Local\BPLauncher\Game\BLUEPROTOCOL\BLUEPROTOCOL\Binaries\Win64\BLUEPROTOCOL-Win64-Shipping.exe)
     private static readonly string _executablePath =
-        _gamePath + @"\BLUEPROTOCOL\BLUEPROTOCOL\Binaries\Win64\BLUEPROTOCOL-Win64-Shipping.exe";
-
-    //Default Config File
-    private static readonly string DefaultConfigFile = DefaultDirectory + "\\config.json";
+        _gamePath + @"\BLUEPROTOCOL\Binaries\Win64\BLUEPROTOCOL-Win64-Shipping.exe";
 
     //Version
     private static readonly string Version = "1.0.0";
@@ -43,7 +40,10 @@ public class AppSettings
     {
         Logger.Debug("Loading accounts asynchronously...");
         await Accounts?.LoadAsync()!;
-        AuthService.SetCurrentAccount(GetAccounts()!.Accounts.First().Value);
+        if (Accounts?.Accounts.Count > 0)
+        {
+            AuthService.SetCurrentAccount(GetAccounts()!.Accounts.First().Value);
+        }
     }
 
     public static string GetBaseUrl()
@@ -54,11 +54,6 @@ public class AppSettings
     public static string GetDefaultDirectory()
     {
         return DefaultDirectory;
-    }
-
-    public static string GetDefaultConfigFile()
-    {
-        return DefaultConfigFile;
     }
 
     public static string GetVersion()
